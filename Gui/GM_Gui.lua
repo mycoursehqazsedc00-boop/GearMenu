@@ -385,15 +385,15 @@ function me.BuildMenu()
     local frame = getglobal(GM_CONSTANTS.ELEMENT_SLOT_FRAME)
     frame:ClearAllPoints()
 
-    -- bind to point slot that was hovered
+    -- anchor swap menu based on configured direction
     local slotAnchor = GM_CONSTANTS.ELEMENT_SLOT .. position
     local menuPos = mod.addonOptions.GetMenuPosition()
     if menuPos == "BOTTOM" then
-      frame:SetPoint("TOPLEFT", slotAnchor, "BOTTOMLEFT", GM_CONSTANTS.INTERFACE_DEFAULT_NEGATIVE_MARGIN, -4)
+      frame:SetPoint("TOPLEFT", slotAnchor, "BOTTOMLEFT", GM_CONSTANTS.INTERFACE_DEFAULT_NEGATIVE_MARGIN, -10)
     elseif menuPos == "LEFT" then
-      frame:SetPoint("TOPRIGHT", slotAnchor, "TOPLEFT", -4, 4)
+      frame:SetPoint("TOPRIGHT", GM_CONSTANTS.ELEMENT_MAIN_FRAME, "TOPLEFT", 0, 0)
     elseif menuPos == "RIGHT" then
-      frame:SetPoint("TOPLEFT", slotAnchor, "TOPRIGHT", 4, 4)
+      frame:SetPoint("TOPLEFT", GM_CONSTANTS.ELEMENT_MAIN_FRAME, "TOPRIGHT", 0, 0)
     else
       frame:SetPoint("BOTTOMLEFT", slotAnchor,
         GM_CONSTANTS.INTERFACE_DEFAULT_NEGATIVE_MARGIN, GM_CONSTANTS.INTERFACE_SLOT_SPACE)
