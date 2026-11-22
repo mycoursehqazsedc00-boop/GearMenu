@@ -70,6 +70,7 @@ GearMenuOptions = {
     5 Legendary (orange)
   ]]--
   ["filterItemQuality"] = 0,
+  ["menuPosition"] = "TOP",
   ["slots"] = {
     ["mainHand"] = 1,
     ["offHand"] = 2,
@@ -140,6 +141,11 @@ function me.SetupConfiguration()
   if GearMenuOptions.filterItemQuality == nil then
     mod.logger.LogInfo(me.tag, "filterItemQuality has unexpected nil value")
     GearMenuOptions.filterItemQuality = 0
+  end
+
+  if GearMenuOptions.menuPosition == nil then
+    mod.logger.LogInfo(me.tag, "menuPosition has unexpected nil value")
+    GearMenuOptions.menuPosition = "TOP"
   end
 
   if GearMenuOptions.slots == nil then
@@ -466,6 +472,24 @@ end
 ]]--
 function me.GetFilterItemQuality()
   return GearMenuOptions.filterItemQuality
+end
+
+--[[
+  Save menu popup position ("TOP", "BOTTOM", "LEFT", "RIGHT")
+
+  @param {string} menuPosition
+]]--
+function me.SetMenuPosition(menuPosition)
+  GearMenuOptions.menuPosition = menuPosition
+end
+
+--[[
+  Get menu popup position
+
+  @return {string}
+]]--
+function me.GetMenuPosition()
+  return GearMenuOptions.menuPosition or "TOP"
 end
 
 --[[

@@ -386,8 +386,18 @@ function me.BuildMenu()
     frame:ClearAllPoints()
 
     -- bind to point slot that was hovered
-    frame:SetPoint("BOTTOMLEFT", GM_CONSTANTS.ELEMENT_SLOT .. position,
-      GM_CONSTANTS.INTERFACE_DEFAULT_NEGATIVE_MARGIN, GM_CONSTANTS.INTERFACE_SLOT_SPACE)
+    local slotAnchor = GM_CONSTANTS.ELEMENT_SLOT .. position
+    local menuPos = mod.addonOptions.GetMenuPosition()
+    if menuPos == "BOTTOM" then
+      frame:SetPoint("TOPLEFT", slotAnchor, "BOTTOMLEFT", GM_CONSTANTS.INTERFACE_DEFAULT_NEGATIVE_MARGIN, -4)
+    elseif menuPos == "LEFT" then
+      frame:SetPoint("TOPRIGHT", slotAnchor, "TOPLEFT", -4, 4)
+    elseif menuPos == "RIGHT" then
+      frame:SetPoint("TOPLEFT", slotAnchor, "TOPRIGHT", 4, 4)
+    else
+      frame:SetPoint("BOTTOMLEFT", slotAnchor,
+        GM_CONSTANTS.INTERFACE_DEFAULT_NEGATIVE_MARGIN, GM_CONSTANTS.INTERFACE_SLOT_SPACE)
+    end
 
     if col == 0 then
       col = 1

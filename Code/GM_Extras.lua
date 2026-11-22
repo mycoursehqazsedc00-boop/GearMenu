@@ -125,6 +125,27 @@ function me.SetSort(arg)
 end
 
 --[[
+  Set swap menu popup direction (top | bottom | left | right)
+
+  @param {string} arg
+]]--
+function me.SetMenuPosition(arg)
+  local map = { top = "TOP", bottom = "BOTTOM", left = "LEFT", right = "RIGHT" }
+  local pos = map[arg or ""]
+  if not pos then
+    mod.logger.Print(gm.L["name"], string.format(gm.L["menupos_usage"], mod.addonOptions.GetMenuPosition()))
+    return
+  end
+
+  mod.addonOptions.SetMenuPosition(pos)
+  local dropdown = getglobal(GM_CONSTANTS.ELEMENT_OPT_MENU_POSITION)
+  if dropdown then
+    UIDropDownMenu_SetSelectedValue(dropdown, pos)
+  end
+  mod.logger.Print(gm.L["name"], string.format(gm.L["menupos_set"], pos))
+end
+
+--[[
   Move the window back to its default position (useful when it got lost)
 ]]--
 function me.ResetPosition()

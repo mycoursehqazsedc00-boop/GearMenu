@@ -523,6 +523,20 @@
                   </OnShow>
                 </Scripts>
               </Button>
+              <Button name="GM_OptMenuPosition" inherits="UIDropDownMenuTemplate">
+                <Anchors>
+                  <Anchor point="TOPLEFT" relativeTo="GM_RightContentMenu" relativePoint="TOPLEFT">
+                    <Offset>
+                      <AbsDimension x="-5" y="-250"/>
+                    </Offset>
+                  </Anchor>
+                </Anchors>
+                <Scripts>
+                  <OnShow>
+                    UIDropDownMenu_Initialize(this, gm.generalMenu.InitializeMenuPositionDropdown)
+                  </OnShow>
+                </Scripts>
+              </Button>
             </Frames>
             <Scripts>
               <OnShow>

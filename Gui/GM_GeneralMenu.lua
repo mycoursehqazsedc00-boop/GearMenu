@@ -291,3 +291,34 @@ function me.DropDownMenuCallback()
   -- UIDROPDOWNMENU_OPEN_MENU is the currently open dropdown menu
   UIDropDownMenu_SetSelectedValue(getglobal(UIDROPDOWNMENU_OPEN_MENU), this.value)
 end
+
+--[[
+  Initialize dropdown menu for swap menu position (TOP/BOTTOM/LEFT/RIGHT)
+]]--
+function me.InitializeMenuPositionDropdown()
+  local menuPos = mod.addonOptions.GetMenuPosition()
+  local optionsList = {
+    { text = gm.L["menu_position_top"], value = "TOP" },
+    { text = gm.L["menu_position_bottom"], value = "BOTTOM" },
+    { text = gm.L["menu_position_left"], value = "LEFT" },
+    { text = gm.L["menu_position_right"], value = "RIGHT" }
+  }
+
+  for i = 1, table.getn(optionsList) do
+    local button = me.CreateDropdownButton(optionsList[i].text, optionsList[i].value, me.MenuPositionDropDownCallback)
+    UIDropDownMenu_AddButton(button)
+  end
+
+  local dropdown = getglobal(GM_CONSTANTS.ELEMENT_OPT_MENU_POSITION)
+  if dropdown and UIDropDownMenu_GetSelectedID(dropdown) == nil then
+    UIDropDownMenu_SetSelectedValue(dropdown, menuPos)
+  end
+end
+
+--[[
+  Callback for menu position dropdown
+]]--
+function me.MenuPositionDropDownCallback()
+  mod.addonOptions.SetMenuPosition(this.value)
+  UIDropDownMenu_SetSelectedValue(getglobal(UIDROPDOWNMENU_OPEN_MENU), this.value)
+end

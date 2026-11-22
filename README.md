@@ -29,6 +29,7 @@ GearMenu works on a stock 1.12.1 client; without ClassicAPI it falls back to `BA
 | `/gmenu use <1-10>` | Use the item in a slot, for macros: `/gmenu use 1` |
 | `/gmenu scale <0.5-2>` | Resize the window (saved) |
 | `/gmenu sort [on/off]` | Sort the item menu by quality, then name (saved). Without argument it toggles |
+| `/gmenu menupos <top/bottom/left/right>` | Set where the swap menu opens relative to the hovered slot (saved) |
 | `/gmenu reset` | Move the window back to its default position |
 | `/gmenu status` | Print the current settings |
 | `/gmenu debug [on/off]` | Debug output, current session only |

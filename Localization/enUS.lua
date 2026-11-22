@@ -39,6 +39,13 @@ gm.L["status_menu"] = "Item menu - sorted: %s, minimum quality: %s"
 gm.L["status_debug"] = "Logging - debug: %s, trace: %s"
 gm.L["status_classicapi"] = "ClassicAPI detected: %s"
 gm.L["status_nampower"] = "Nampower detected: %s"
+gm.L["menu_position_top"] = "Menu: On Top"
+gm.L["menu_position_bottom"] = "Menu: At Bottom"
+gm.L["menu_position_left"] = "Menu: On Left"
+gm.L["menu_position_right"] = "Menu: On Right"
+gm.L["menupos"] = "/gmenu menupos top|bottom|left|right - Set swap menu direction"
+gm.L["menupos_usage"] = "Usage: /gmenu menupos top|bottom|left|right (current: %s)"
+gm.L["menupos_set"] = "Swap menu position set to %s."
 
 -- slot translations
 gm.L["slot_name_head"] = "Head"
