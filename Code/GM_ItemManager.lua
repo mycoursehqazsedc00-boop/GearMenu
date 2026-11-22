@@ -128,7 +128,7 @@ function me.UpdateWornItem(item)
 
   local texture = mod.itemHelper.RetrieveItemInfo(item.slotId)
   getglobal(GM_CONSTANTS.ELEMENT_SLOT .. item.gmSlotPosition .. "Icon"):SetTexture(texture)
-  getglobal(GM_CONSTANTS.ELEMENT_SLOT .. item.gmSlotPosition .. "Icon"):SetDesaturated(0)
+  getglobal(GM_CONSTANTS.ELEMENT_SLOT .. item.gmSlotPosition .. "Icon"):SetDesaturated(nil)
   getglobal(GM_CONSTANTS.ELEMENT_SLOT .. item.gmSlotPosition):SetChecked(0)
   mod.cooldown.UpdateCooldownForWornItem(item.slotId, item.gmSlotPosition)
 end
