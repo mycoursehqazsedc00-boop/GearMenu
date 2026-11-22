@@ -308,6 +308,8 @@ end
   @return {table | nil}
 ]]--
 function me.FindItemForSlotPosition(gmSlotPosition)
+  if gmSlotPosition == nil then return nil end
+
   for name, item in pairs(items) do
     if item.gmSlotPosition == gmSlotPosition then
       return item
