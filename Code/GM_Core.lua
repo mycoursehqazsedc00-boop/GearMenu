@@ -73,6 +73,14 @@ end
 function me.OnEvent()
   if event == "PLAYER_LOGIN" then
     me.logger.LogEvent(me.tag, "PLAYER_LOGIN")
+    me.hasClassicAPI = (CLASSIC_API_VERSION ~= nil)
+    me.hasNampower = (type(GetNampowerVersion) == "function")
+    if not me.hasClassicAPI then
+      this:RegisterEvent("BAG_UPDATE")
+    end
+    if me.hasNampower then
+      this:RegisterEvent("SPELL_CAST_EVENT")
+    end
     me.Initialize()
   elseif event == "UPDATE_BINDINGS" then
     me.gui.ShowKeyBindings()
@@ -86,9 +94,23 @@ function me.OnEvent()
   elseif event == "PLAYER_EQUIPMENT_CHANGED" then
     me.logger.LogEvent(me.tag, "PLAYER_EQUIPMENT_CHANGED")
     me.ScheduleInventoryRefresh()
-  elseif event == "BAG_UPDATE_DELAYED" then
-    me.logger.LogEvent(me.tag, "BAG_UPDATE_DELAYED")
+  elseif event == "BAG_UPDATE_DELAYED" or event == "BAG_UPDATE" then
+    me.logger.LogEvent(me.tag, event)
     me.ScheduleInventoryRefresh()
+  elseif event == "SPELL_CAST_EVENT" then
+    -- Nampower: arg1=success (1), arg5=itemId (0 if not an item cast)
+    if arg1 == 1 and arg5 and arg5 ~= 0 then
+      local itemIdStr = tostring(arg5)
+      local items = me.itemManager.GetAllRegisteredItems()
+      for _, item in pairs(items) do
+        if not item.gmSlotDisabled and me.itemHelper.GetItemIdBySlot(item.slotId) == itemIdStr then
+          me.logger.LogEvent(me.tag, "SPELL_CAST_EVENT item=" .. itemIdStr .. " slot=" .. item.slotId)
+          me.quickChange.CheckItemUse(item.slotId)
+          me.gui.ReflectItemUse(item.gmSlotPosition)
+          break
+        end
+      end
+    end
   elseif (event == "PLAYER_REGEN_ENABLED" or event == "PLAYER_UNGHOST"
     or event == "PLAYER_ALIVE") and not me.common.IsPlayerReallyDead() then
       if event == "PLAYER_REGEN_ENABLED" then

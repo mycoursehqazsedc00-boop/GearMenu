@@ -48,7 +48,8 @@ end
 function me.UpdateCooldownForBaggedItems(baggedItems)
   if baggedItems == nil or table.getn(baggedItems) == 0 then return end -- no other items available abort
 
-  for i = 1, table.getn(baggedItems) do
+  local count = math.min(table.getn(baggedItems), 30)
+  for i = 1, count do
     local start, duration, enable = GetContainerItemCooldown(baggedItems[i].bag, baggedItems[i].slot)
 
     CooldownFrame_SetTimer(
@@ -98,8 +99,11 @@ function me.SetCooldown(frame, start, duration)
 
   if start == 0 then
     -- item has no cooldown
-    frame:SetText("")
-  elseif cooldown < 3 and not frame:GetText() then
+    if frame.gmHasText then
+      frame:SetText("")
+      frame.gmHasText = nil
+    end
+  elseif cooldown < 3 and not frame.gmHasText then
     -- do not display global cooldown
     -- if there is already a text it is just a cooldown that entered into this state
   else
@@ -112,6 +116,7 @@ function me.SetCooldown(frame, start, duration)
     end
 
     frame:SetText(cooldownText)
+    frame.gmHasText = true
   end
 end
 
@@ -120,8 +125,10 @@ end
 ]]--
 function me.SetCooldownFont(identifier)
   local item = getglobal(identifier .. "Time")
+  if item.gmFontSet then return end
   item:SetFont("Fonts\\FRIZQT__.TTF", 16, "OUTLINE")
   item:SetTextColor(1, .82, 0, 1)
   item:ClearAllPoints()
   item:SetPoint("CENTER", getglobal(identifier), "CENTER")
+  item.gmFontSet = true
 end

@@ -32,6 +32,7 @@ me.currentSlot = 0
 me.currentPosition = 0
 -- collection of gathered bagged items
 me.baggedItems = {}
+local reflectTimerSeq = 0
 
 --[[
   Show gearmenu mainframe
@@ -71,7 +72,7 @@ end
 function me.ItemButtonOnEnter()
   GameTooltip_SetDefaultAnchor(getglobal(GM_CONSTANTS.ELEMENT_TOOLTIP), this)
 
-  local position = mod.common.ExtractPositionFromName(this:GetName())
+  local position = (this and this.GetName) and mod.common.ExtractPositionFromName(this:GetName()) or nil
   local item = mod.itemManager.FindItemForSlotPosition(position)
 
   -- abort if no item could be found
@@ -103,6 +104,15 @@ function me.ItemButtonOnClick(button)
   -- abort if no item could be found
   if item == nil then return end
 
+  if IsShiftKeyDown() and ChatFrameEditBox:IsVisible() then
+    this:SetChecked(0)
+    local link = GetInventoryItemLink("player", item.slotId)
+    if link then
+      ChatFrameEditBox:Insert(link)
+    end
+    return
+  end
+
   if button == "RightButton" then
     -- rightclick
     mod.combatQueue.RemoveFromQueue(item.slotId)
@@ -131,7 +141,7 @@ function me.ItemButtonOnReceiveDrag()
   -- abort if drag and drop is disabled
   if mod.addonOptions.IsDragAndDropDisabled() then return end
 
-  local position = mod.common.ExtractPositionFromName(this:GetName())
+  local position = (this and this.GetName) and mod.common.ExtractPositionFromName(this:GetName()) or nil
   local item = mod.itemManager.FindItemForSlotPosition(position)
 
   -- abort if no item could be found
@@ -197,7 +207,7 @@ function me.ItemButtonOnDragStart()
   -- abort if drag and drop is disabled
   if mod.addonOptions.IsDragAndDropDisabled() then return end
 
-  local position = mod.common.ExtractPositionFromName(this:GetName())
+  local position = (this and this.GetName) and mod.common.ExtractPositionFromName(this:GetName()) or nil
   local item = mod.itemManager.FindItemForSlotPosition(position)
 
   -- abort if no item could be found
@@ -226,10 +236,22 @@ end
   Choosing an item in slotframe
 ]]--
 function me.MenuItemOnClick()
+  local entry = me.baggedItems[this:GetID()]
+  if not entry then return end
+
+  if IsShiftKeyDown() and ChatFrameEditBox:IsVisible() then
+    this:SetChecked(0)
+    local link = GetContainerItemLink(entry.bag, entry.slot)
+    if link then
+      ChatFrameEditBox:Insert(link)
+    end
+    return
+  end
+
   mod.itemHelper.EquipItemById(
-    me.baggedItems[this:GetID()].id,
+    entry.id,
     me.currentSlot,
-    me.baggedItems[this:GetID()].equipSlot
+    entry.equipSlot
   )
   getglobal(GM_CONSTANTS.ELEMENT_SLOT_FRAME):Hide()
 end
@@ -274,7 +296,8 @@ function me.ReflectItemUse(position)
   --[[
     Remove checked status from all buttons
   ]]
-  local timerName = "ReflectItemUse" .. math.floor(math.random() * 100000000000000)
+  reflectTimerSeq = reflectTimerSeq + 1
+  local timerName = "ReflectItemUse_" .. reflectTimerSeq
 
   local reflectItemUseCallback = function()
     getglobal(GM_CONSTANTS.ELEMENT_SLOT .. position):SetChecked(0)
@@ -297,7 +320,7 @@ function me.BuildMenu()
 
   me.baggedItems = {}
 
-  local position = mod.common.ExtractPositionFromName(this:GetName())
+  local position = (this and this.GetName) and mod.common.ExtractPositionFromName(this:GetName()) or nil
 
   -- if buildmenu is called manualy position is retrieved from cached position
   if position == nil then
@@ -326,7 +349,8 @@ function me.BuildMenu()
     local xPos = 8
     local yPos = 8
 
-    for i = 1, table.getn(me.baggedItems) do
+    local count = math.min(table.getn(me.baggedItems), 30)
+    for i = 1, count do
       local item = getglobal(GM_CONSTANTS.ELEMENT_MENU_ITEM .. i)
       item:SetChecked(0)
       getglobal(GM_CONSTANTS.ELEMENT_MENU_ITEM .. i .. "Icon"):SetTexture(me.baggedItems[i].texture)
@@ -340,7 +364,7 @@ function me.BuildMenu()
         end
         xPos = row * GM_CONSTANTS.INTERFACE_SLOT_SPACE + GM_CONSTANTS.INTERFACE_DEFAULT_MARGIN
         -- special case for uneven numberOfItems, add 1 col
-        if i == table.getn(me.baggedItems) then
+        if i == count then
           col = col + 1
         end
       else

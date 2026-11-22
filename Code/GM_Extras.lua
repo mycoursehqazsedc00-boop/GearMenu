@@ -190,7 +190,8 @@ end
 ]]--
 function me.PrintStatus()
   local frame = getglobal(GM_CONSTANTS.ELEMENT_MAIN_FRAME)
-  local classicApi = type(C_Item) == "table"
+  local classicApi = (CLASSIC_API_VERSION ~= nil)
+  local nampower = (type(GetNampowerVersion) == "function")
 
   DEFAULT_CHAT_FRAME:AddMessage(gm.L["info_title"] .. " " .. GM_ENVIRONMENT.ADDON_VERSION)
   DEFAULT_CHAT_FRAME:AddMessage(string.format(gm.L["status_window"],
@@ -205,6 +206,8 @@ function me.PrintStatus()
     me.OnOff(mod.logger.logEvent == true)))
   DEFAULT_CHAT_FRAME:AddMessage(string.format(gm.L["status_classicapi"],
     classicApi and gm.L["yes"] or gm.L["no"]))
+  DEFAULT_CHAT_FRAME:AddMessage(string.format(gm.L["status_nampower"],
+    nampower and gm.L["yes"] or gm.L["no"]))
 end
 
 --[[

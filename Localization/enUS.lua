@@ -38,6 +38,7 @@ gm.L["status_window"] = "Window - visible: %s, locked: %s, scale: %s"
 gm.L["status_menu"] = "Item menu - sorted: %s, minimum quality: %s"
 gm.L["status_debug"] = "Logging - debug: %s, trace: %s"
 gm.L["status_classicapi"] = "ClassicAPI detected: %s"
+gm.L["status_nampower"] = "Nampower detected: %s"
 
 -- slot translations
 gm.L["slot_name_head"] = "Head"

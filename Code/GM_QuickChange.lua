@@ -28,6 +28,7 @@ local me = {}
 mod.quickChange = me
 
 me.tag = "QuickChange"
+local timerSeq = 0
 
 --[[
   Save new quick change rule
@@ -44,8 +45,8 @@ function me.AddQuickChangeRule(changeFromId, changeToId, delay)
   local quickChangeRule = {}
   local slotId
 
-  changeFromName, _, itemFromQuality, _, _, _, _, equipFromSlot, itemFromTexture = GetItemInfo(changeFromId)
-  changeToName, _, itemToQuality, _, _, _, _, equipToSlot, itemToTexture = GetItemInfo(changeToId)
+  local changeFromName, _, _, _, _, _, _, equipFromSlot = GetItemInfo(changeFromId)
+  local changeToName = GetItemInfo(changeToId)
 
   for _, item in pairs(GM_CONSTANTS.ITEM_CATEGORIES) do
     for i = 1, table.getn(item.type) do
@@ -83,13 +84,15 @@ function me.UpdateQuickChange(slotId)
   local quickChangeRules = mod.addonOptions.GetQuickChangeRules()
 
   for i = 1, table.getn(quickChangeRules) do
-    for it = 1, table.getn(quickChangeRules[i].slotId) do
-      if slotId == quickChangeRules[i].slotId[it] then
-        local itemId = mod.itemHelper.GetItemIdBySlot(slotId)
+    if quickChangeRules[i].slotId then
+      for it = 1, table.getn(quickChangeRules[i].slotId) do
+        if slotId == quickChangeRules[i].slotId[it] then
+          local itemId = mod.itemHelper.GetItemIdBySlot(slotId)
 
-        if tonumber(itemId) == quickChangeRules[i].changeFromId then
-          -- found a quick change rule that matches - prepare for switching
-          me.SwitchItems(quickChangeRules[i], slotId)
+          if tonumber(itemId) == quickChangeRules[i].changeFromId then
+            -- found a quick change rule that matches - prepare for switching
+            me.SwitchItems(quickChangeRules[i], slotId)
+          end
         end
       end
     end
@@ -102,6 +105,7 @@ end
   @param {number} slotId
 ]]--
 function me.CheckItemUse(slotId)
+  local timerName = "checkItemUseStatus_" .. slotId
   -- wait a bit then check if there is a startime for the cooldown on the item
   local checkItemUseStatusCallback = function ()
     local start, duration, enable = GetInventoryItemCooldown("player", slotId)
@@ -113,11 +117,11 @@ function me.CheckItemUse(slotId)
       mod.quickChange.UpdateQuickChange(slotId)
     end
 
-    mod.timer.StopTimer("checkItemUseStatus")
+    mod.timer.DestroyTimer(timerName)
   end
 
-  mod.timer.CreateTimer("checkItemUseStatus", checkItemUseStatusCallback, 0.25, 0.25)
-  mod.timer.StartTimer("checkItemUseStatus")
+  mod.timer.CreateTimer(timerName, checkItemUseStatusCallback, 0.25, false)
+  mod.timer.StartTimer(timerName)
 end
 
 --[[
@@ -127,22 +131,23 @@ end
   @param {number} slotId
 ]]--
 function me.SwitchItems(rule, slotId)
-  local timerName = "QuickChange_" .. math.floor(math.random() * 100000000000000)
+  timerSeq = timerSeq + 1
+  local timerName = "QuickChange_" .. timerSeq
 
   local quickChangeSwitchCallback = function()
     -- generated one-shot timer - remove it from the pool
     mod.timer.DestroyTimer(timerName)
-    mod.logger.LogDebug(me.tag, "ChangeToName: " .. rule.changeToName .. " slotId: " .. slotId)
+    mod.logger.LogDebug(me.tag, "ChangeToName: " .. tostring(rule.changeToName or "") .. " slotId: " .. slotId)
     mod.combatQueue.AddToQueue(rule.changeToId, slotId)
     -- kick off combat queue
     mod.combatQueue.ProcessQueue()
   end
 
   if rule.changeDelay ~= 0 then
-    mod.timer.CreateTimer(timerName, quickChangeSwitchCallback, rule.changeDelay, 0.25)
+    mod.timer.CreateTimer(timerName, quickChangeSwitchCallback, rule.changeDelay, false)
     mod.timer.StartTimer(timerName)
   else
-    mod.timer.CreateTimer(timerName, quickChangeSwitchCallback, 0.25, 0.25)
+    mod.timer.CreateTimer(timerName, quickChangeSwitchCallback, 0.25, false)
     -- start a timer before switching the item. An immediate change is blocked by the ui
     mod.timer.StartTimer(timerName) -- default delay
   end

@@ -151,13 +151,14 @@ function me.UnequipItemBySlotId(slotId)
       if itemLink == nil then
         PickupInventoryItem(slotId)
         PickupContainerItem(i, j)
-        return
+        return true
       end
     end
   end
 
   -- no empty space found
   mod.logger.PrintUserError(gm.L["unequip_failed"])
+  return false
 end
 
 --[[
@@ -177,7 +178,9 @@ function me.SwitchItems(itemId, slotId, itemSlotType)
     if wornType == "INVTYPE_2HWEAPON" and (itemSlotType == "INVTYPE_SHIELD"
       or itemSlotType == "INVTYPE_WEAPON" or itemSlotType == "INVTYPE_WEAPONOFFHAND"
       or itemSlotType == "INVTYPE_HOLDABLE") then
-        me.UnequipItemBySlotId(GM_CONSTANTS.ITEMS.MAINHAND.slotId)
+        if not me.UnequipItemBySlotId(GM_CONSTANTS.ITEMS.MAINHAND.slotId) then
+          return
+        end
       end
   end
 
@@ -188,13 +191,13 @@ function me.SwitchItems(itemId, slotId, itemSlotType)
       local _, _, isLocked = GetContainerItemInfo(bagNumber, bagPos)
       if not isLocked and not IsInventoryItemLocked(slotId) then
         -- neither container item nor inventory item locked, perform swap
-
         PickupContainerItem(bagNumber, bagPos)
         PickupInventoryItem(slotId)
-
+        mod.combatQueue.RemoveFromQueue(slotId)
       end
+    else
+      -- item is no longer in bags (already equipped or removed)
+      mod.combatQueue.RemoveFromQueue(slotId)
     end
-    -- make sure to clear combatQueue
-    mod.combatQueue.RemoveFromQueue(slotId)
   end
 end

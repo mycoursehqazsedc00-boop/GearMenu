@@ -9,8 +9,9 @@ Fork of [wow-vanilla-gearmenu](https://github.com/RagedUnicorn/wow-vanilla-gearm
 | Mod | Status | Used for |
 |---|---|---|
 | [ClassicAPI](https://github.com/brues-code/ClassicAPI) | optional | `PLAYER_EQUIPMENT_CHANGED` and `BAG_UPDATE_DELAYED` events to refresh the slots, and `GetCursorInfo()` to handle dropping an offhand item while a two-handed weapon is equipped |
+| [Nampower](https://github.com/brues-code/nampower) | optional | `SPELL_CAST_EVENT` to trigger Quick Change even when equipped items are activated from macros or standard action bars |
 
-No other client mod is used. GearMenu works on a stock 1.12.1 client; without ClassicAPI the two events never fire, the addon relies on `UNIT_INVENTORY_CHANGED`, and drag and drop behaves like the original.
+GearMenu works on a stock 1.12.1 client; without ClassicAPI it falls back to `BAG_UPDATE` and `UNIT_INVENTORY_CHANGED`, and without Nampower Quick Change triggers from GearMenu clicks, keybinds, and `/gmenu use`.
 
 ## Commands
 
