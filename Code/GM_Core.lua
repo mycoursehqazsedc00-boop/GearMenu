@@ -75,9 +75,9 @@ function me.OnEvent()
     me.logger.LogEvent(me.tag, "PLAYER_LOGIN")
     me.hasClassicAPI = (CLASSIC_API_VERSION ~= nil)
     me.hasNampower = (type(GetNampowerVersion) == "function")
-    if not me.hasClassicAPI then
-      this:RegisterEvent("BAG_UPDATE")
-    end
+    -- Always register BAG_UPDATE (debounced by 50ms) so stock 1.12.1 and older
+    -- ClassicAPI builds without BAG_UPDATE_DELAYED still refresh open menus.
+    this:RegisterEvent("BAG_UPDATE")
     if me.hasNampower then
       this:RegisterEvent("SPELL_CAST_EVENT")
     end

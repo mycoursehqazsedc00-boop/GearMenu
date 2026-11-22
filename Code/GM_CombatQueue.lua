@@ -96,7 +96,8 @@ function me.UpdateCombatQueue(slotId)
     local _, bagNumber, bagPos = mod.itemHelper.FindItemById(itemId, true)
 
     if bagNumber then
-      icon:SetTexture(GetContainerItemInfo(bagNumber, bagPos))
+      local texture = GetContainerItemInfo(bagNumber, bagPos)
+      icon:SetTexture(texture)
       icon:Show()
     else
       -- item vanished from the bags (sold, moved or already equiped) - drop the stale entry
