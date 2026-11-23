@@ -34,7 +34,7 @@ me.tag = "Cmd"
 ]]--
 local INFO_LINES = {
   "show", "hide", "toggle", "opt", "lock", "unlock", "use", "scale",
-  "sort", "menupos", "dock2", "reset", "status", "debug", "trace", "reload"
+  "sort", "menupos", "menupos2", "dock2", "reset", "status", "debug", "trace", "reload"
 }
 
 --[[
@@ -99,6 +99,8 @@ function me.HandleCommand(msg)
     mod.extras.SetSort(arg)
   elseif cmd == "menupos" then
     mod.extras.SetMenuPosition(arg)
+  elseif cmd == "menupos2" then
+    mod.extras.SetMenuPosition2(arg)
   elseif cmd == "dock2" then
     mod.extras.SetSecondDock(arg)
   elseif cmd == "reset" then

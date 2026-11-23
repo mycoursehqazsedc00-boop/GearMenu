@@ -71,6 +71,7 @@ GearMenuOptions = {
   ]]--
   ["filterItemQuality"] = 0,
   ["menuPosition"] = "TOP",
+  ["menuPosition2"] = "TOP",
   ["secondDockEnabled"] = false,
   ["slotDock"] = {},
   ["slots"] = {
@@ -148,6 +149,10 @@ function me.SetupConfiguration()
   if GearMenuOptions.menuPosition == nil then
     mod.logger.LogInfo(me.tag, "menuPosition has unexpected nil value")
     GearMenuOptions.menuPosition = "TOP"
+  end
+
+  if GearMenuOptions.menuPosition2 == nil then
+    GearMenuOptions.menuPosition2 = "TOP"
   end
 
   if GearMenuOptions.secondDockEnabled == nil then
@@ -500,6 +505,24 @@ end
 ]]--
 function me.GetMenuPosition()
   return GearMenuOptions.menuPosition or "TOP"
+end
+
+--[[
+  Save Dock 2 menu popup position ("TOP", "BOTTOM", "LEFT", "RIGHT")
+
+  @param {string} menuPosition
+]]--
+function me.SetMenuPosition2(menuPosition)
+  GearMenuOptions.menuPosition2 = menuPosition
+end
+
+--[[
+  Get Dock 2 menu popup position
+
+  @return {string}
+]]--
+function me.GetMenuPosition2()
+  return GearMenuOptions.menuPosition2 or "TOP"
 end
 
 --[[

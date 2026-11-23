@@ -30,6 +30,7 @@ GearMenu works on a stock 1.12.1 client; without ClassicAPI it falls back to `BA
 | `/gmenu scale <0.5-2>` | Resize the window (saved) |
 | `/gmenu sort [on/off]` | Sort the item menu by quality, then name (saved). Without argument it toggles |
 | `/gmenu menupos <top/bottom/left/right>` | Set where the swap menu opens relative to the hovered slot (saved) |
+| `/gmenu menupos2 <top/bottom/left/right>` | Set where the swap menu opens for Dock 2 (saved) |
 | `/gmenu dock2 [on/off]` | Enable or disable the second gear dock (saved) |
 | `/gmenu reset` | Move the window back to its default position |
 | `/gmenu status` | Print the current settings |
@@ -51,6 +52,10 @@ GearMenu works on a stock 1.12.1 client; without ClassicAPI it falls back to `BA
 - Item quality filter for the menu
 - Lockable window
 - Item menu sorted by quality, then name (can be turned off)
+- Configurable swap menu direction (`Top`, `Bottom`, `Left`, `Right`) via General Options or `/gmenu menupos` (`LEFT` and `RIGHT` align with the dock and expand upward)
+- Optional Second Gear Dock (`Enable Second Dock` in General Options or `/gmenu dock2`): assign any of the 10 slots to Dock 2 (`D2` in Slots tab) with its own independent swap menu direction (`/gmenu menupos2`)
+- Swap menu renders at `FULLSCREEN_DIALOG` strata to stay above chat frames and action bars
+- Shift-Click an equipped slot or bagged item while chat is open to insert its item link
 - Slash commands for macros, scale, position reset, debug and tracing
 
 ## Compared to the original (v1.2.2)
@@ -58,17 +63,25 @@ GearMenu works on a stock 1.12.1 client; without ClassicAPI it falls back to `BA
 | Area | Original | This fork |
 |---|---|---|
 | Slash command | `/gm` (overrides the game's GM ticket command), `/gearmenu` | `/gmenu`, `/gearmenu`; `/gm` is left alone |
-| Commands | show, hide, opt, reload | Adds toggle, lock, unlock, use, scale, sort, reset, status, debug, trace |
+| Commands | show, hide, opt, reload | Adds toggle, lock, unlock, use, scale, sort, menupos, menupos2, dock2, reset, status, debug, trace |
+| Second Gear Dock | Single bar only | Optional Dock 2 (`GM_MainFrame2`) with per-slot `D2` assignment and independent menu direction |
+| Swap menu direction & strata | Fixed above slot at `MEDIUM` strata | Configurable `Top`/`Bottom`/`Left`/`Right` per dock, upward-expanding `LEFT`/`RIGHT`, `FULLSCREEN_DIALOG` strata |
+| ClassicAPI `v1.23.1` icons | `SetTexture(RetrieveItemInfo(...))` passed 3 args and `SetDesaturated(0)` hid worn icons | Single-arg `SetTexture(tex)` and `SetDesaturated(nil)` |
+| Nampower Quick Change | Only triggered from GearMenu clicks/keybinds | Optional `SPELL_CAST_EVENT` triggers Quick Change from macros and standard action bars |
+| Chat item links | Not supported | Shift-Click slots or menu items inserts link when chat edit box is open |
 | Item menu order | Bag order | Quality, then name (toggle with `/gmenu sort`) |
 | Window | Could be dragged off screen, no scale | Clamped to the screen, saved scale, `reset` command |
 | Macros | Not possible | `/gmenu use <slot>` |
-| Refresh on inventory change | Full rebuild for every event | Events within 50 ms are coalesced into one refresh |
+| Refresh on inventory change | Full rebuild for every event | Events within 50 ms are coalesced into one refresh; `BAG_UPDATE` fallback when ClassicAPI is absent |
 | Optional ClassicAPI events | None | `PLAYER_EQUIPMENT_CHANGED`, `BAG_UPDATE_DELAYED` |
 | Drop offhand while wearing a two-hander | Not possible | Works with ClassicAPI (`GetCursorInfo`) |
 | Debugging | Edit the source to change the log level | `/gmenu debug`, `/gmenu trace` at runtime |
 | Item lookup by ID | Substring match: id `1234` also matched `12345` or an enchant id, which could equip or queue the wrong item | Exact match on `item:<id>:` |
 | Items missing from the client cache | Menu raised an error | Item is skipped |
 | Missing item category | `GetItemsByType` returned `nil` and crashed the caller | Returns an empty list |
+| >30 matching bagged items | Crashed past `GM_MenuItem30` | Capped safely at 30 items |
+| Cooldown GCD & font | Displayed `1 s`/`2 s` for 1.5s GCD when `GetText()` returned `""`; re-applied font every tick | `gmHasText` flag suppresses GCD; font applied once |
+| Quick Change & Combat Queue | Leaked globals, nil `slotId` crash, shared timer overwrite, premature queue removal on lock/full bags | Locals only, per-slot timer, nil guards, queue preserved if swap fails |
 | Equipped-item lists (Quick Change) | Undefined variable used as bag slot, entries duplicated per item type | Each equipped item listed once, no bag fields |
 | Combat queue | Nil error for slots without a position, leaked globals, stale entries for items that left the bags | Guarded, locals only, stale entries dropped |
 | Timers | Removed while iterating; generated one-shot timers stayed in the pool forever | Iterates a snapshot, generated timers are destroyed after firing |

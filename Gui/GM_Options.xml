@@ -559,6 +559,20 @@
                   </OnShow>
                 </Scripts>
               </CheckButton>
+              <Button name="GM_OptMenuPosition2" inherits="UIDropDownMenuTemplate">
+                <Anchors>
+                  <Anchor point="TOPLEFT" relativeTo="GM_RightContentMenu" relativePoint="TOPLEFT">
+                    <Offset>
+                      <AbsDimension x="195" y="-45"/>
+                    </Offset>
+                  </Anchor>
+                </Anchors>
+                <Scripts>
+                  <OnShow>
+                    UIDropDownMenu_Initialize(this, gm.generalMenu.InitializeMenuPosition2Dropdown)
+                  </OnShow>
+                </Scripts>
+              </Button>
             </Frames>
             <Scripts>
               <OnShow>

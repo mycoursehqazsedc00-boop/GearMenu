@@ -391,11 +391,12 @@ function me.BuildMenu()
     local frame = getglobal(GM_CONSTANTS.ELEMENT_SLOT_FRAME)
     frame:ClearAllPoints()
 
-    -- anchor swap menu based on configured direction
+    -- anchor swap menu based on configured direction for this slot's dock
     local slotAnchor = GM_CONSTANTS.ELEMENT_SLOT .. position
     local slotObj = getglobal(slotAnchor)
+    local dock2 = getglobal(GM_CONSTANTS.ELEMENT_MAIN_FRAME2)
     local dockAnchor = (slotObj and slotObj:GetParent()) or getglobal(GM_CONSTANTS.ELEMENT_MAIN_FRAME)
-    local menuPos = mod.addonOptions.GetMenuPosition()
+    local menuPos = (dock2 and dockAnchor == dock2) and mod.addonOptions.GetMenuPosition2() or mod.addonOptions.GetMenuPosition()
     if menuPos == "BOTTOM" then
       frame:SetPoint("TOPLEFT", slotAnchor, "BOTTOMLEFT", GM_CONSTANTS.INTERFACE_DEFAULT_NEGATIVE_MARGIN, -10)
     elseif menuPos == "LEFT" then

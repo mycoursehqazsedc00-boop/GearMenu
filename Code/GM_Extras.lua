@@ -155,6 +155,27 @@ function me.SetMenuPosition(arg)
 end
 
 --[[
+  Set Dock 2 swap menu popup direction (top | bottom | left | right)
+
+  @param {string} arg
+]]--
+function me.SetMenuPosition2(arg)
+  local map = { top = "TOP", bottom = "BOTTOM", left = "LEFT", right = "RIGHT" }
+  local pos = map[arg or ""]
+  if not pos then
+    mod.logger.Print(gm.L["name"], string.format(gm.L["menupos2_usage"], mod.addonOptions.GetMenuPosition2()))
+    return
+  end
+
+  mod.addonOptions.SetMenuPosition2(pos)
+  local dropdown = getglobal(GM_CONSTANTS.ELEMENT_OPT_MENU_POSITION2)
+  if dropdown then
+    UIDropDownMenu_SetSelectedValue(dropdown, pos)
+  end
+  mod.logger.Print(gm.L["name"], string.format(gm.L["menupos2_set"], pos))
+end
+
+--[[
   Move the window back to its default position (useful when it got lost)
 ]]--
 function me.ResetPosition()
