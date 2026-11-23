@@ -111,3 +111,44 @@ function me.DropDownMenuCallback()
   UIDropDownMenu_SetSelectedValue(getglobal(UIDROPDOWNMENU_OPEN_MENU), newValue)
   mod.itemManager.UpdateWornItems()
 end
+
+--[[
+  Create and refresh per-slot "D2" checkboxes in the Slots options tab
+]]--
+function me.InitSlotDockCheckboxes()
+  local parent = getglobal("GM_ContentSlots")
+  local rightMenu = getglobal("GM_RightContentMenu")
+  if not parent or not rightMenu then return end
+
+  local secondDockEnabled = mod.addonOptions.IsSecondDockEnabled()
+  for i = 1, GM_CONSTANTS.ADDON_SLOTS do
+    local cbName = "GM_OptSlotDock" .. i
+    local cb = getglobal(cbName)
+    if not cb then
+      cb = CreateFrame("CheckButton", cbName, parent, "GM_CheckButtonTemplate")
+      cb:SetWidth(18)
+      cb:SetHeight(18)
+      local title = getglobal("GM_TitleSlot" .. i)
+      if title then
+        cb:SetPoint("LEFT", title, "RIGHT", 6, 0)
+      end
+      local txt = getglobal(cbName .. "Text")
+      if txt then
+        txt:SetText(gm.L["dock2_label"])
+        txt:SetTextColor(.8, .8, .8)
+      end
+      cb:SetID(i)
+      cb:SetScript("OnClick", function()
+        local pos = this:GetID()
+        mod.addonOptions.SetSlotDock(pos, (this:GetChecked() == 1) and 2 or 1)
+        mod.gui.RearrangeSlotPositions()
+      end)
+    end
+    cb:SetChecked(mod.addonOptions.GetSlotDock(i) == 2)
+    if secondDockEnabled then
+      cb:Show()
+    else
+      cb:Hide()
+    end
+  end
+end

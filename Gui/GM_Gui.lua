@@ -39,6 +39,10 @@ local reflectTimerSeq = 0
 ]]--
 function me.ShowMainFrame()
   getglobal(GM_CONSTANTS.ELEMENT_MAIN_FRAME):Show()
+  if mod.addonOptions.IsSecondDockEnabled() then
+    local dock2 = getglobal(GM_CONSTANTS.ELEMENT_MAIN_FRAME2)
+    if dock2 then dock2:Show() end
+  end
 end
 
 --[[
@@ -46,6 +50,8 @@ end
 ]]--
 function me.HideMainFrame()
   getglobal(GM_CONSTANTS.ELEMENT_MAIN_FRAME):Hide()
+  local dock2 = getglobal(GM_CONSTANTS.ELEMENT_MAIN_FRAME2)
+  if dock2 then dock2:Hide() end
 end
 
 --[[
@@ -54,7 +60,7 @@ end
 function me.DragButtonOnMouseDown()
   if mod.addonOptions.IsWindowLocked() then return end
 
-  getglobal(GM_CONSTANTS.ELEMENT_MAIN_FRAME):StartMoving()
+  this:GetParent():StartMoving()
 end
 
 --[[
@@ -63,7 +69,7 @@ end
 function me.DragButtonOnMouseUp()
   if mod.addonOptions.IsWindowLocked() then return end
 
-  getglobal(GM_CONSTANTS.ELEMENT_MAIN_FRAME):StopMovingOrSizing()
+  this:GetParent():StopMovingOrSizing()
 end
 
 --[[
@@ -387,13 +393,15 @@ function me.BuildMenu()
 
     -- anchor swap menu based on configured direction
     local slotAnchor = GM_CONSTANTS.ELEMENT_SLOT .. position
+    local slotObj = getglobal(slotAnchor)
+    local dockAnchor = (slotObj and slotObj:GetParent()) or getglobal(GM_CONSTANTS.ELEMENT_MAIN_FRAME)
     local menuPos = mod.addonOptions.GetMenuPosition()
     if menuPos == "BOTTOM" then
       frame:SetPoint("TOPLEFT", slotAnchor, "BOTTOMLEFT", GM_CONSTANTS.INTERFACE_DEFAULT_NEGATIVE_MARGIN, -10)
     elseif menuPos == "LEFT" then
-      frame:SetPoint("TOPRIGHT", GM_CONSTANTS.ELEMENT_MAIN_FRAME, "TOPLEFT", 0, 0)
+      frame:SetPoint("BOTTOMRIGHT", dockAnchor, "BOTTOMLEFT", 0, 0)
     elseif menuPos == "RIGHT" then
-      frame:SetPoint("TOPLEFT", GM_CONSTANTS.ELEMENT_MAIN_FRAME, "TOPRIGHT", 0, 0)
+      frame:SetPoint("BOTTOMLEFT", dockAnchor, "BOTTOMRIGHT", 0, 0)
     else
       frame:SetPoint("BOTTOMLEFT", slotAnchor,
         GM_CONSTANTS.INTERFACE_DEFAULT_NEGATIVE_MARGIN, GM_CONSTANTS.INTERFACE_SLOT_SPACE)
@@ -424,7 +432,9 @@ end
   Close slot frame after a delay
 ]]--
 function me.SlotFrameMouseOver()
-  if (not MouseIsOver(getglobal(GM_CONSTANTS.ELEMENT_MAIN_FRAME))) and (not MouseIsOver(getglobal(GM_CONSTANTS.ELEMENT_SLOT_FRAME))) then
+  local dock2 = getglobal(GM_CONSTANTS.ELEMENT_MAIN_FRAME2)
+  local overDock2 = dock2 and dock2:IsVisible() and MouseIsOver(dock2)
+  if (not MouseIsOver(getglobal(GM_CONSTANTS.ELEMENT_MAIN_FRAME))) and (not overDock2) and (not MouseIsOver(getglobal(GM_CONSTANTS.ELEMENT_SLOT_FRAME))) then
     mod.timer.StopTimer("BaggedItemCooldownUpdate")
     mod.timer.StopTimer("MenuMouseover")
     getglobal(GM_CONSTANTS.ELEMENT_SLOT_FRAME):Hide()
@@ -464,36 +474,52 @@ end
   Rearrange slotpositions after activating or deactivating a slot
 ]]--
 function me.RearrangeSlotPositions()
-  local slots = {} -- table for visible slots
+  local mainFrame = getglobal(GM_CONSTANTS.ELEMENT_MAIN_FRAME)
+  local dock2 = getglobal(GM_CONSTANTS.ELEMENT_MAIN_FRAME2)
+  local secondDockEnabled = mod.addonOptions.IsSecondDockEnabled()
 
-  -- make table of active slots
-  for i = 1, GM_CONSTANTS.ADDON_SLOTS do
-    local slotFrame = getglobal(GM_CONSTANTS.ELEMENT_SLOT .. i)
+  local count1 = 0
+  local count2 = 0
 
-    if slotFrame:IsShown() then
-      slots[i] = GM_CONSTANTS.ELEMENT_SLOT .. i
+  for index = 1, GM_CONSTANTS.ADDON_SLOTS do
+    local slotFrame = getglobal(GM_CONSTANTS.ELEMENT_SLOT .. index)
+    if slotFrame and slotFrame:IsShown() then
+      local useDock2 = secondDockEnabled and dock2 and (mod.addonOptions.GetSlotDock(index) == 2)
+      local parentDock = useDock2 and dock2 or mainFrame
+      local posIdx = useDock2 and count2 or count1
+
+      slotFrame:SetParent(parentDock)
+      slotFrame:ClearAllPoints()
+      slotFrame:SetPoint("TOPLEFT", parentDock, "TOPLEFT",
+        GM_CONSTANTS.INTERFACE_DEFAULT_MARGIN + (GM_CONSTANTS.INTERFACE_SLOT_SPACE * posIdx),
+        GM_CONSTANTS.INTERFACE_DEFAULT_NEGATIVE_MARGIN)
+
+      if useDock2 then
+        count2 = count2 + 1
+      else
+        count1 = count1 + 1
+      end
     end
   end
 
-  local i = 0
-  -- position active slots
-  for index, value in pairs(slots) do
-    local slotFrame = getglobal(GM_CONSTANTS.ELEMENT_SLOT .. index)
+  if count1 == 0 then count1 = 1 end
+  mainFrame:SetWidth(GM_CONSTANTS.INTERFACE_DEFAULT_MARGIN
+    + (GM_CONSTANTS.INTERFACE_SLOT_SPACE * count1) + 4)
 
-    slotFrame:SetPoint("TOPLEFT",
-      GM_CONSTANTS.INTERFACE_DEFAULT_MARGIN + (GM_CONSTANTS.INTERFACE_SLOT_SPACE * i),
-      GM_CONSTANTS.INTERFACE_DEFAULT_NEGATIVE_MARGIN)
-
-    i = i + 1
+  if dock2 then
+    if secondDockEnabled then
+      if count2 == 0 then count2 = 1 end
+      dock2:SetWidth(GM_CONSTANTS.INTERFACE_DEFAULT_MARGIN
+        + (GM_CONSTANTS.INTERFACE_SLOT_SPACE * count2) + 4)
+      if mainFrame:IsVisible() then
+        dock2:Show()
+      else
+        dock2:Hide()
+      end
+    else
+      dock2:Hide()
+    end
   end
-
-  if i == 0 then
-    i = 1
-  end
-
-  -- set size of mainframe
-  getglobal(GM_CONSTANTS.ELEMENT_MAIN_FRAME):SetWidth(GM_CONSTANTS.INTERFACE_DEFAULT_MARGIN
-    + (GM_CONSTANTS.INTERFACE_SLOT_SPACE * i) + 4)
 end
 
 --[[

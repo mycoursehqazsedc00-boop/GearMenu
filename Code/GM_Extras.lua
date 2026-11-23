@@ -39,9 +39,16 @@ local MAX_SCALE = 2
 ]]--
 function me.ApplyWindowSettings()
   local frame = getglobal(GM_CONSTANTS.ELEMENT_MAIN_FRAME)
+  local scale = mod.addonOptions.GetScale()
 
-  frame:SetScale(mod.addonOptions.GetScale())
+  frame:SetScale(scale)
   frame:SetClampedToScreen(1)
+
+  local frame2 = getglobal(GM_CONSTANTS.ELEMENT_MAIN_FRAME2)
+  if frame2 then
+    frame2:SetScale(scale)
+    frame2:SetClampedToScreen(1)
+  end
 end
 
 --[[
@@ -100,6 +107,8 @@ function me.SetScale(arg)
 
   mod.addonOptions.SetScale(scale)
   getglobal(GM_CONSTANTS.ELEMENT_MAIN_FRAME):SetScale(scale)
+  local frame2 = getglobal(GM_CONSTANTS.ELEMENT_MAIN_FRAME2)
+  if frame2 then frame2:SetScale(scale) end
   mod.logger.Print(gm.L["name"], string.format(gm.L["scale_set"], scale))
 end
 
@@ -155,8 +164,41 @@ function me.ResetPosition()
   frame:ClearAllPoints()
   frame:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", DEFAULT_POINT_X, DEFAULT_POINT_Y)
   frame:SetUserPlaced(true)
+
+  local frame2 = getglobal(GM_CONSTANTS.ELEMENT_MAIN_FRAME2)
+  if frame2 then
+    frame2:StopMovingOrSizing()
+    frame2:ClearAllPoints()
+    frame2:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", DEFAULT_POINT_X, DEFAULT_POINT_Y - 64)
+    frame2:SetUserPlaced(true)
+  end
+
   mod.gui.ShowMainFrame()
   mod.logger.Print(gm.L["name"], gm.L["reset_done"])
+end
+
+function me.SetSecondDock(arg)
+  local enabled
+  if arg == "on" then
+    enabled = true
+  elseif arg == "off" then
+    enabled = false
+  else
+    enabled = not mod.addonOptions.IsSecondDockEnabled()
+  end
+
+  if enabled then
+    mod.addonOptions.EnableSecondDock()
+  else
+    mod.addonOptions.DisableSecondDock()
+  end
+
+  mod.gui.RearrangeSlotPositions()
+  me.ApplyWindowSettings()
+  mod.opt.ReflectLockState(mod.addonOptions.IsWindowLocked())
+  local cb = getglobal(GM_CONSTANTS.ELEMENT_OPT_SECOND_DOCK)
+  if cb then cb:SetChecked(enabled) end
+  mod.logger.Print(gm.L["name"], string.format(gm.L["dock2_state"], me.OnOff(enabled)))
 end
 
 --[[

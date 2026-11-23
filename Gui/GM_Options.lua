@@ -49,25 +49,37 @@ end
 ]]--
 function me.ReflectLockState(locked)
   local mainFrame = getglobal(GM_CONSTANTS.ELEMENT_MAIN_FRAME)
+  local mainFrame2 = getglobal(GM_CONSTANTS.ELEMENT_MAIN_FRAME2)
   local slotFrame = getglobal(GM_CONSTANTS.ELEMENT_SLOT_FRAME)
+  local drag2 = getglobal(GM_CONSTANTS.ELEMENT_DRAG_BUTTON2)
 
   if locked then
     mainFrame:SetBackdropColor(0, 0, 0, 0)
     mainFrame:SetBackdropBorderColor(0, 0, 0, 0 * 2)
+    if mainFrame2 then
+      mainFrame2:SetBackdropColor(0, 0, 0, 0)
+      mainFrame2:SetBackdropBorderColor(0, 0, 0, 0)
+    end
     slotFrame:SetBackdropColor(0, 0, 0, 0)
     slotFrame:SetBackdropBorderColor(0, 0, 0, 0 * 2)
     slotFrame:EnableMouse(0 * 2)
 
     -- hide move button
     getglobal(GM_CONSTANTS.ELEMENT_DRAG_BUTTON):Hide()
+    if drag2 then drag2:Hide() end
   else
     mainFrame:SetBackdropColor(.5, .5, .5, .5)
     mainFrame:SetBackdropBorderColor(.5, .5, .5, .5 * 2)
+    if mainFrame2 then
+      mainFrame2:SetBackdropColor(.5, .5, .5, .5)
+      mainFrame2:SetBackdropBorderColor(.5, .5, .5, 1)
+    end
     slotFrame:SetBackdropColor(.5, .5, .5, .5)
     slotFrame:SetBackdropBorderColor(.5, .5, .5, .5 * 2)
     slotFrame:EnableMouse(.5 * 2)
 
     -- show move button
     getglobal(GM_CONSTANTS.ELEMENT_DRAG_BUTTON):Show()
+    if drag2 then drag2:Show() end
   end
 end

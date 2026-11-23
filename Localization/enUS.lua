@@ -46,6 +46,11 @@ gm.L["menu_position_right"] = "Menu: On Right"
 gm.L["menupos"] = "/gmenu menupos top|bottom|left|right - Set swap menu direction"
 gm.L["menupos_usage"] = "Usage: /gmenu menupos top|bottom|left|right (current: %s)"
 gm.L["menupos_set"] = "Swap menu position set to %s."
+gm.L["enable_second_dock"] = "Enable Second Dock"
+gm.L["enable_second_dock_tooltip"] = "Show a second independent gear dock and assign slots to Dock 2 in the Slots tab."
+gm.L["dock2_label"] = "D2"
+gm.L["dock2"] = "/gmenu dock2 [on/off] - Toggle the second gear dock"
+gm.L["dock2_state"] = "Second gear dock %s."
 
 -- slot translations
 gm.L["slot_name_head"] = "Head"

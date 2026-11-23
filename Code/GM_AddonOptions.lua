@@ -71,6 +71,8 @@ GearMenuOptions = {
   ]]--
   ["filterItemQuality"] = 0,
   ["menuPosition"] = "TOP",
+  ["secondDockEnabled"] = false,
+  ["slotDock"] = {},
   ["slots"] = {
     ["mainHand"] = 1,
     ["offHand"] = 2,
@@ -146,6 +148,14 @@ function me.SetupConfiguration()
   if GearMenuOptions.menuPosition == nil then
     mod.logger.LogInfo(me.tag, "menuPosition has unexpected nil value")
     GearMenuOptions.menuPosition = "TOP"
+  end
+
+  if GearMenuOptions.secondDockEnabled == nil then
+    GearMenuOptions.secondDockEnabled = false
+  end
+
+  if GearMenuOptions.slotDock == nil then
+    GearMenuOptions.slotDock = {}
   end
 
   if GearMenuOptions.slots == nil then
@@ -490,6 +500,45 @@ end
 ]]--
 function me.GetMenuPosition()
   return GearMenuOptions.menuPosition or "TOP"
+end
+
+--[[
+  @return {boolean}
+]]--
+function me.IsSecondDockEnabled()
+  return GearMenuOptions.secondDockEnabled == true
+end
+
+function me.EnableSecondDock()
+  GearMenuOptions.secondDockEnabled = true
+end
+
+function me.DisableSecondDock()
+  GearMenuOptions.secondDockEnabled = false
+end
+
+--[[
+  Get which dock (1 or 2) a slot position belongs to
+
+  @param {number} position
+  @return {number}
+]]--
+function me.GetSlotDock(position)
+  if GearMenuOptions.slotDock and GearMenuOptions.slotDock[position] == 2 then
+    return 2
+  end
+  return 1
+end
+
+--[[
+  Assign a slot position to dock 1 or 2
+
+  @param {number} position
+  @param {number} dockNum
+]]--
+function me.SetSlotDock(position, dockNum)
+  GearMenuOptions.slotDock = GearMenuOptions.slotDock or {}
+  GearMenuOptions.slotDock[position] = (dockNum == 2) and 2 or 1
 end
 
 --[[

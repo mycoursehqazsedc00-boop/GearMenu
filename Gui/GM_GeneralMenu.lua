@@ -35,7 +35,8 @@ local options = {
   {"ShowKeyBindings", gm.L["show_keybindings"], gm.L["show_keybindings_tooltip"]},
   {"DisableTooltips", gm.L["show_tooltips"], gm.L["show_tooltips_tooltip"]},
   {"SmallTooltips", gm.L["small_tooltips"], gm.L["small_tooltips_tooltip"]},
-  {"DisableDragAndDrop", gm.L["disable_drag_and_drop"], gm.L["disable_drag_and_drop_tooltip"]}
+  {"DisableDragAndDrop", gm.L["disable_drag_and_drop"], gm.L["disable_drag_and_drop_tooltip"]},
+  {"SecondDock", gm.L["enable_second_dock"], gm.L["enable_second_dock_tooltip"]}
 }
 
 function me.InitGeneralMenu()
@@ -321,4 +322,24 @@ end
 function me.MenuPositionDropDownCallback()
   mod.addonOptions.SetMenuPosition(this.value)
   UIDropDownMenu_SetSelectedValue(getglobal(UIDROPDOWNMENU_OPEN_MENU), this.value)
+end
+
+function me.SecondDockOptionOnShow()
+  if mod.addonOptions.IsSecondDockEnabled() then
+    this:SetChecked(true)
+  else
+    this:SetChecked(false)
+  end
+end
+
+function me.SecondDockOptionOnClick()
+  local enabled = this:GetChecked()
+  if enabled == 1 then
+    mod.addonOptions.EnableSecondDock()
+  else
+    mod.addonOptions.DisableSecondDock()
+  end
+  mod.gui.RearrangeSlotPositions()
+  mod.extras.ApplyWindowSettings()
+  mod.opt.ReflectLockState(mod.addonOptions.IsWindowLocked())
 end

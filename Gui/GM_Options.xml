@@ -385,6 +385,11 @@
                 </Scripts>
               </Button>
             </Frames>
+            <Scripts>
+              <OnShow>
+                gm.slotsMenu.InitSlotDockCheckboxes()
+              </OnShow>
+            </Scripts>
           </Frame>
           <Frame name="GM_ContentGeneral" hidden="true">
             <Size x="420" y="320"/>
@@ -537,6 +542,23 @@
                   </OnShow>
                 </Scripts>
               </Button>
+              <CheckButton name="GM_OptSecondDock" inherits="GM_CheckButtonTemplate">
+                <Anchors>
+                  <Anchor point="TOPLEFT" relativeTo="GM_RightContentMenu" relativePoint="TOPLEFT">
+                    <Offset>
+                      <AbsDimension x="210" y="-10"/>
+                    </Offset>
+                  </Anchor>
+                </Anchors>
+                <Scripts>
+                  <OnClick>
+                    gm.generalMenu.SecondDockOptionOnClick()
+                  </OnClick>
+                  <OnShow>
+                    gm.generalMenu.SecondDockOptionOnShow()
+                  </OnShow>
+                </Scripts>
+              </CheckButton>
             </Frames>
             <Scripts>
               <OnShow>
